@@ -25,6 +25,8 @@ const LoginScreen = ({ navigation }) => {
   const handleLogin = () => {
     console.log('Usuario:', username);
     console.log('Contraseña:', password);
+
+    navigation.navigate("CreateReport");
   };
 
   const handleRegister = () => {
