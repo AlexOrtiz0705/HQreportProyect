@@ -61,7 +61,7 @@ export default function CreateReport({ navigation }) {
   );
 
   return (
-    <SafeAreaView style={styles.fullScreen}>
+    <SafeAreaView style={styles.fullScreen} edges={['top','left', 'right', 'bottom']}>
       <StatusBar barStyle="light-content" backgroundColor="#000" />
       {/* Nuestro Header personalizado */}
       <CustomHeader />
@@ -131,7 +131,7 @@ export default function CreateReport({ navigation }) {
 }
 
 // --- Estilos ---
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   fullScreen: {
     flex: 1,
     backgroundColor: "#fff", // Fondo blanco para toda la pantalla
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "#000", // Fondo negro
-    paddingVertical: 10,
+    paddingVertical: 20,
     paddingHorizontal: 15,
   },
   logoContainer: {

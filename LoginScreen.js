@@ -11,10 +11,11 @@ const LoginScreen = ({ navigation }) => {
     if (email === 'admin@hqreport.com' && password === '123456') {
       // Login exitoso → navega a Pricing
       navigation.replace('Pricing'); // Usa `replace` para no volver al login
+      navigation.navigate("EditReport");
     } else {
       Alert.alert('Error', 'Credenciales incorrectas');
     }
-    navigation.navigate("CreateReport");
+    
   };
 
   return (

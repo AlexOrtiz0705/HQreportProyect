@@ -8,20 +8,21 @@ import { StatusBar } from 'expo-status-bar';
 import LoginScreen from './LoginScreen';
 import PricingScreen from './Planes'; // Verifica la ruta
 import CreateReport from './CreateReport';
+import EditReport from './EditReport';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }} edges={['top', 'left', 'right']}>
+      {/* <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }} edges={['top', 'left', 'right','bottom']}> */}
         
         <StatusBar 
           style="light" 
           backgroundColor="transparent"
           translucent 
         />
-
+        
         <NavigationContainer>
           <Stack.Navigator initialRouteName="Login">
             <Stack.Screen
@@ -35,14 +36,19 @@ export default function App() {
               options={{ headerShown: false }}
             />
             <Stack.Screen
-          name="CreateReport"
-          component={CreateReport}
-          options={{ headerShown: false }}
-      />
+              name="CreateReport"
+              component={CreateReport}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="EditReport"
+              component={EditReport}
+              options={{ headerShown: false }}
+            />
           </Stack.Navigator>
         </NavigationContainer>
 
-      </SafeAreaView>
+      {/* </SafeAreaView> */}
     </SafeAreaProvider>
   );
 }
