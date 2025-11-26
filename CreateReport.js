@@ -73,7 +73,7 @@ export default function CreateReport({ navigation }) {
   },
  ];
 
- const [activeTab, setActiveTab] = useState("editar");
+ const [activeTab, setActiveTab] = useState("crear");
 
  const tabs = [
   { label: "Crear", value: "crear" },
@@ -116,7 +116,7 @@ export default function CreateReport({ navigation }) {
          key={r.id}
          title={r.title}
          onVista={() => console.log(`Ver ${r.title}`)}
-         onCrear={() => console.log(`Crear ${r.title}`)}
+         onCrear={() => navigation.navigate('ConfigReport')}
         />
        ))}
       </ScrollView>

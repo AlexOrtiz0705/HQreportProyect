@@ -53,7 +53,7 @@ export default function App() {
               component={main}
               options={{ headerShown: false }}
             />
-            <StackScreen
+            <Stack.Screen
               name="ConfigReport"
               component={ConfigReport}
               options={{ headerShown: false }}

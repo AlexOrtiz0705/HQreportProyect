@@ -1,7 +1,8 @@
-import { useRouter } from 'expo-router';
-import React from 'react';
+import { useRouter} from 'expo-router';
+import React, {useEffect, useState} from 'react';
 import { Image, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import CustomHeader from './components/CustomHeader';
 
 export default function HomeScreen({navigation}) {
   const router = useRouter();
@@ -25,8 +26,8 @@ export default function HomeScreen({navigation}) {
     {
       id: 1,
       title: 'Crear/Editar\nReportes',
-      icon: require('../../assets/da1.png'),
-      route: './test'
+      icon: require('./assets/da1.png'),
+      route: 'CreateReport'//'./test'
     },
     {
       id: 2,
@@ -63,7 +64,7 @@ export default function HomeScreen({navigation}) {
 
   const handleNavigation = (route: string) => {
     console.log(`Navegando a: ${route}`);
-     router.push(route);
+     navigation.navigate(route);
   };
 
   const handleLogoPress = () => {
@@ -78,7 +79,7 @@ export default function HomeScreen({navigation}) {
       <View style={styles.header}>
         <TouchableOpacity onPress={handleLogoPress}>
           <Image 
-            source={require('../../assets/LogoT.png')}
+            source={require('./assets/LogoT.png')}
             style={styles.logo}
             resizeMode="contain"
           />

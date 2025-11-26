@@ -5,25 +5,27 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  StatusBar,
   Image,
   Button,
 } from 'react-native';
 
 import CustomHeader from './components/CustomHeader';
-import { navigate } from 'expo-router/build/global-state/routing';
-import { useNavigation } from 'expo-router';
+import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 // Aquí va tu componente de Header
 // <Header />
 
 
-const AppearanceScreen = () => {
+const ConfigReport = ({navigation}) => {
   const [theme, setTheme] = useState('claro');
-  const [color, setColor] = useStionnavigationte('orange');
+  const [color, setColor] = useState('orange');
 
   const colorOptions = ['orange', 'red', 'blue', 'cyan', 'black'];
 
   return (
-    <>
+    <SafeAreaView style={styles.fullScreen} edges={["top", "left", "right", "bottom"]}>
+       <StatusBar barStyle="light-content" backgroundColor="#000" />
     <CustomHeader navigation={navigation}/>
     <ScrollView style={styles.container}>
       {/* Aquí va el título "Apariencia" */}
@@ -70,39 +72,66 @@ const AppearanceScreen = () => {
 
       {/* Vista Previa */}
       <Text style={styles.sectionTitle}>Vista Previa</Text>
-      <View style={styles.previewBox}>
+        <View style={styles.previewBox}>
         <Text style={styles.previewText}>HQREPORT</Text>
-        <View style={styles.mapPlaceholder}>
-          <Text style={styles.mapText}>[Mapa con marcadores]</Text>
-        </View>
+
+        {/* Mapa */}
+        <Image
+            source={ require("./assets/location-map.webp") } 
+            style={styles.mapImage}
+        />
+
+        {/* Fotos Presuntos */}
         <View style={styles.photoRow}>
-          <UploadBox label="Foto del Presunto #1" />
-          <UploadBox label="Foto del Presunto #2" />
+            <View style={styles.uploadBox}>
+            <Text style={styles.uploadLabel}>Foto Reparación #1</Text>
+            <Image 
+                source={require("./assets/instalacion-aire-acondicionado.jpeg")} 
+                style={styles.photoImage}
+            />
+            </View>
+
+            <View style={styles.uploadBox}>
+            <Text style={styles.uploadLabel}>Foto Reparación #2</Text>
+            <Image 
+                source={require("./assets/instalacion-electrica.jpg")} 
+                style={styles.photoImage}
+            />
+            </View>
         </View>
-        <UploadBox label="Foto del Sitio Antes del Evento" />
-      </View>
+
+        {/* Foto del Sitio */}
+        <View style={styles.uploadBox}>
+            <Text style={styles.uploadLabel}>Foto del Sitio Antes del Evento</Text>
+            <Image 
+            source={require("./assets/imagen-sitio.jpg")} 
+            style={styles.photoImage}
+            />
+        </View>
+        </View>
+
+        {/* Reporte amigable */}
+      <View style={styles.reportCard}>
+        <Text style={styles.reportTitle}>Reporte de Evento</Text>
+        <Text style={styles.reportItem}>📍 Ubicación: Colonia Kennedy, Tegucigalpa</Text>
+        <Text style={styles.reportItem}>📅 Fecha: 25 Noviembre 2025</Text>
+        <Text style={styles.reportItem}>🕒 Hora: 21:45</Text>
+        <Text style={styles.reportItem}>👤 Técnico #1: Juan Pérez</Text>
+        <Text style={styles.reportItem}>👤 Técnico #2: Luis Gómez</Text>
+        <Text style={styles.reportItem}>📷 Sitio Antes del Evento: Foto adjunta</Text>
+        <TouchableOpacity style={styles.reportButton}>
+          <Text style={styles.reportButtonText}>Ver Detalles</Text>
+        </TouchableOpacity>
 
       {/* Botón Guardar */}
       <TouchableOpacity style={styles.saveButton}>
         <Text style={styles.saveButtonText}>Guardar Cambios</Text>
       </TouchableOpacity>
 
-      {/* Reporte amigable */}
-      <Text style={styles.sectionTitle}>Ejemplo de Reporte</Text>
-      <View style={styles.reportCard}>
-        <Text style={styles.reportTitle}>Reporte de Evento</Text>
-        <Text style={styles.reportItem}>📍 Ubicación: Colonia Kennedy, Tegucigalpa</Text>
-        <Text style={styles.reportItem}>📅 Fecha: 25 Noviembre 2025</Text>
-        <Text style={styles.reportItem}>🕒 Hora: 21:45</Text>
-        <Text style={styles.reportItem}>👤 Presunto #1: Juan Pérez</Text>
-        <Text style={styles.reportItem}>👤 Presunto #2: Luis Gómez</Text>
-        <Text style={styles.reportItem}>📷 Sitio Antes del Evento: Foto adjunta</Text>
-        <TouchableOpacity style={styles.reportButton}>
-          <Text style={styles.reportButtonText}>Ver Detalles</Text>
-        </TouchableOpacity>
+      
       </View>
     </ScrollView>
-    </>
+    </SafeAreaView>
   );
 };
 
@@ -116,6 +145,10 @@ const UploadBox = ({ label }) => (
 );
 
 const styles = StyleSheet.create({
+  fullScreen: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
   container: {
     padding: 16,
     backgroundColor: '#fff',
@@ -241,6 +274,21 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
   },
+  mapImage: {
+  width: "100%",
+  height: 120,
+  borderRadius: 8,
+  marginBottom: 12,
+},
+
+photoImage: {
+  width: "100%",
+  height: 120,
+  borderRadius: 8,
+  marginTop: 6,
+  backgroundColor: "#ddd",
+}
+
 });
 
 export default ConfigReport;
