@@ -11,7 +11,9 @@ import CreateReport from './CreateReport';
 import EditReport from './EditReport';
 import main from './main.tsx';
 import ConfigReport from './ConfigReport';
+//import ReportScreen from './ReportScreen';
 import { StackScreen } from 'react-native-screens';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -58,6 +60,12 @@ export default function App() {
               component={ConfigReport}
               options={{ headerShown: false }}
             />
+            {/*<Stack.Screen
+              name="ReportScreen"
+              component={ReportScreen}
+              options={{headerShown: false}}
+            ></Stack.Screen>
+            */}
           </Stack.Navigator>
         </NavigationContainer>
 

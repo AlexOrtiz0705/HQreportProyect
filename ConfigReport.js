@@ -9,6 +9,7 @@ import {
   Image,
   Button,
 } from 'react-native';
+import { Snackbar } from 'react-native-paper';
 
 import CustomHeader from './components/CustomHeader';
 import { useRouter } from 'expo-router';
@@ -18,10 +19,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 const ConfigReport = ({navigation}) => {
+
+
   const [theme, setTheme] = useState('claro');
   const [color, setColor] = useState('orange');
 
   const colorOptions = ['orange', 'red', 'blue', 'cyan', 'black'];
+
+  const onGuardar = () =>{
+    setTimeout(() => {
+    navigation.navigate('CreateReport');
+  }, 300);
+  }
 
   return (
     <SafeAreaView style={styles.fullScreen} edges={["top", "left", "right", "bottom"]}>
@@ -124,13 +133,13 @@ const ConfigReport = ({navigation}) => {
         </TouchableOpacity>
 
       {/* Botón Guardar */}
-      <TouchableOpacity style={styles.saveButton}>
-        <Text style={styles.saveButtonText}>Guardar Cambios</Text>
-      </TouchableOpacity>
 
+      <TouchableOpacity style={styles.saveButton} onPress={onGuardar}>
+        <Text style={styles.saveButtonText} >Guardar</Text>
+      </TouchableOpacity>
       
       </View>
-    </ScrollView>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -245,7 +254,7 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: '#fff',
     fontSize: 16,
-    textAlign: 'center',
+    textAlign: 'center'
   },
   reportCard: {
     backgroundColor: '#f9f9f9',
