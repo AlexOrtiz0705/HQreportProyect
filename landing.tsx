@@ -3,11 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   Dimensions,
   Image,
-  Keyboard,
-  KeyboardAvoidingView,
-  Modal,
   Platform,
-  Pressable,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -16,6 +12,8 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import Modal from 'react-native-modal';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
@@ -103,7 +101,7 @@ export default function App() {
   ];
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <StatusBar barStyle="light-content" />
       
       {/* --- STICKY NAVBAR --- */}
@@ -126,68 +124,65 @@ export default function App() {
 
       {/* --- MODAL DE CONTACTO --- */}
       <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
+        isVisible={modalVisible}
+        onBackdropPress={() => setModalVisible(false)}
+        onBackButtonPress={() => setModalVisible(false)}
+        animationIn="zoomIn"
+        animationOut="zoomOut"
+        backdropOpacity={0.8}
+        backdropColor="#000"
+        avoidKeyboard
+        useNativeDriver={true}
+        style={styles.modalContainer}
       >
-        <Pressable onPress={() => setModalVisible(false)}>
-          <View style={styles.modalOverlay}>
-            <Pressable onPress={Keyboard.dismiss}>
-               <KeyboardAvoidingView 
-                 behavior={Platform.OS === "ios" ? "padding" : "height"}
-                 style={styles.modalContentWrapper}
-               >
-                  <View style={styles.modalView}>
-                    <View style={styles.modalHeader}>
-                      <Text style={styles.modalTitle}>Conoce mas sobre nosotros</Text>
-                      <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
-                        <Text style={styles.closeButtonText}>✕</Text>
-                      </TouchableOpacity>
-                    </View>
-                    
-                    <Text style={styles.modalSubtitle}>Déjanos tus datos y te contactaremos brevemente.</Text>
-
-                    <TextInput 
-                      style={styles.input} 
-                      placeholder="Nombre completo" 
-                      placeholderTextColor="#666"
-                    />
-                    <TextInput 
-                      style={styles.input} 
-                      placeholder="Correo electrónico" 
-                      placeholderTextColor="#666" 
-                      keyboardType="email-address"
-                    />
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Teléfono"
-                      placeholderTextColor="#666"
-                      keyboardType={Platform.OS === 'ios' ? 'phone-pad' : 'phone-pad'}
-                      value={phone}
-                      onChangeText={setPhone}
-                    />
-                    <TextInput 
-                      style={styles.input} 
-                      placeholder="Organización (Opcional)" 
-                      placeholderTextColor="#666"
-                    />
-                    <TextInput 
-                      style={[styles.input, styles.textArea]} 
-                      placeholder="Descripción o consulta" 
-                      placeholderTextColor="#666"
-                      multiline={true}
-                      numberOfLines={4}
-                    />
-
-                    <TouchableOpacity style={styles.submitButton} onPress={() => setModalVisible(false)}>
-                      <Text style={styles.submitButtonText}>Enviar Mensaje</Text>
-                    </TouchableOpacity>
-                  </View>
-               </KeyboardAvoidingView>
-            </Pressable>
+        <View style={styles.modalView}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Conoce mas sobre nosotros</Text>
+            <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
+              <Text style={styles.closeButtonText}>✕</Text>
+            </TouchableOpacity>
           </View>
-        </Pressable>
+          
+          <Text style={styles.modalSubtitle}>Déjanos tus datos y te contactaremos brevemente.</Text>
+
+          <ScrollView scrollEnabled={true} keyboardShouldPersistTaps="handled">
+            <TextInput 
+              style={styles.input} 
+              placeholder="Nombre completo" 
+              placeholderTextColor="#666"
+            />
+            <TextInput 
+              style={styles.input} 
+              placeholder="Correo electrónico" 
+              placeholderTextColor="#666" 
+              keyboardType="email-address"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Teléfono"
+              placeholderTextColor="#666"
+              keyboardType="phone-pad"
+              value={phone}
+              onChangeText={setPhone}
+            />
+            <TextInput 
+              style={styles.input} 
+              placeholder="Organización (Opcional)" 
+              placeholderTextColor="#666"
+            />
+            <TextInput 
+              style={[styles.input, styles.textArea]} 
+              placeholder="Descripción o consulta" 
+              placeholderTextColor="#666"
+              multiline={true}
+              numberOfLines={4}
+            />
+
+            <TouchableOpacity style={styles.submitButton} onPress={() => setModalVisible(false)}>
+              <Text style={styles.submitButtonText}>Enviar Mensaje</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
       </Modal>
 
       <ScrollView 
@@ -459,7 +454,7 @@ export default function App() {
         </View>
 
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -537,6 +532,11 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   // --- MODAL ---
+  modalContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 0,
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.8)',
@@ -556,6 +556,7 @@ const styles = StyleSheet.create({
     borderColor: '#333',
     boxShadow: '0px 10px 10px rgba(0, 0, 0, 0.5)',
     elevation: 10,
+    maxHeight: '90%',
   },
   modalHeader: {
     flexDirection: 'row',
@@ -595,7 +596,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   submitButton: {
-    backgroundColor: COLORS.primaryBrand, // UNIFICADO
+    backgroundColor: COLORS.primaryBrand,
     padding: 15,
     borderRadius: 30,
     alignItems: 'center',
