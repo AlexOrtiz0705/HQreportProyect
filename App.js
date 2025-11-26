@@ -9,6 +9,9 @@ import LoginScreen from './LoginScreen';
 import PricingScreen from './Planes'; // Verifica la ruta
 import CreateReport from './CreateReport';
 import EditReport from './EditReport';
+import main from './main.tsx';
+import ConfigReport from './ConfigReport';
+import { StackScreen } from 'react-native-screens';
 
 const Stack = createNativeStackNavigator();
 
@@ -43,6 +46,16 @@ export default function App() {
             <Stack.Screen
               name="EditReport"
               component={EditReport}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="main"
+              component={main}
+              options={{ headerShown: false }}
+            />
+            <StackScreen
+              name="ConfigReport"
+              component={ConfigReport}
               options={{ headerShown: false }}
             />
           </Stack.Navigator>

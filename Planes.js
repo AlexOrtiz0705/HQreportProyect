@@ -87,7 +87,9 @@ const PricingScreen = () => {
       <StatusBar barStyle="light-content" backgroundColor="#000" />
 
       <View style={styles.header}>
-        <Text style={styles.logo}>HQREPORT</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('CreateReport')}>
+          <Text style={styles.logo}>HQREPORT</Text>
+        </TouchableOpacity>
         <View style={styles.headerRight}>
           <TouchableOpacity onPress={openDrawer}>
             <Text style={styles.headerIcon}>Menu</Text>

@@ -1,14 +1,18 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import Logo from '../assets/Logo.png';
+//import main from './main.tsx'
 
 export default function CustomHeader({ navigation }) {
     return (
         <View style={styles.header}>
               
-              <View style={styles.logoContainer}>
-                <Image source={Logo} style={styles.logoImage} resizeMode="contain" />
-              </View>
+              <TouchableOpacity onPress={() => navigation.navigate('main')}>
+                <View style={styles.logoContainer}>
+                    <Image source={Logo} style={styles.logoImage} resizeMode="contain" />
+                </View>
+              </TouchableOpacity>
+              
               <View style={styles.navbuttons}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Text style={styles.icon}>{"<"}</Text>
