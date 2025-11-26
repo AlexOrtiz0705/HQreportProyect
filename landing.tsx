@@ -1,4 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Dimensions,
@@ -32,6 +33,7 @@ const COLORS = {
 
 export default function App() {
   const navigation: any = useNavigation();
+  const router = useRouter();
   useEffect(() => {
     try {
       navigation?.setOptions?.({ headerShown: false });
@@ -116,7 +118,7 @@ export default function App() {
           <TouchableOpacity onPress={() => scrollToSection('soluciones')}>
             <Text style={styles.navText}>Soluciones</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => scrollToSection('soporte')}>
+          <TouchableOpacity onPress={() => setModalVisible(true)}>
             <Text style={styles.navText}>Contacto</Text>
           </TouchableOpacity>
         </View>
@@ -199,7 +201,10 @@ export default function App() {
              resizeMode="contain"
            />
           <View style={styles.headerRight}>
-            <TouchableOpacity style={styles.ctaButtonHeader}>
+            <TouchableOpacity 
+              style={styles.ctaButtonHeader}
+              onPress={() => router.push('./LoginScreen')}
+            >
               <Text style={styles.ctaButtonTextHeader}>¡Comienza ya!</Text>
             </TouchableOpacity>
           </View>
@@ -311,7 +316,10 @@ export default function App() {
               ))}
             </View>
 
-            <TouchableOpacity style={styles.unifiedButton}>
+            <TouchableOpacity 
+              style={styles.unifiedButton}
+              onPress={() => router.push('./Planes')}
+            >
               <Text style={styles.unifiedButtonText}>Ver Planes</Text>
             </TouchableOpacity>
 
@@ -334,7 +342,10 @@ export default function App() {
             <Text style={[styles.subtitle, { textAlign: 'center', maxWidth: 300 }]}>
                Necesitas una solución que esté a la altura. Por eso desarrollamos HQReport. Un enfoque amigable para optimizar tu empresa.
             </Text>
-            <TouchableOpacity style={[styles.unifiedButton, { marginTop: 20, marginBottom: 0 }]}>
+            <TouchableOpacity 
+              style={[styles.unifiedButton, { marginTop: 20, marginBottom: 0 }]}
+              onPress={() => router.push('./Planes')}
+            >
               <Text style={styles.unifiedButtonText}>Descubre más</Text>
             </TouchableOpacity>
           </View>
