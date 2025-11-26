@@ -10,6 +10,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
@@ -50,7 +51,7 @@ export default function AdminScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <StatusBar barStyle="light-content" backgroundColor="#1a1a1a" />
 
       {/* Header similar to index */}
@@ -97,7 +98,7 @@ export default function AdminScreen({ navigation }) {
         </CardSection>
 
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 

@@ -1,9 +1,7 @@
-import React, {useEffect, useState} from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, StatusBar } from 'react-native';
 import { useRouter } from 'expo-router';
-import CustomHeader from './components/CustomHeader';
+import React from 'react';
+import { Image, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import DynamicTabBar from './components/Dynamic';
 
 export default function HomeScreen({navigation}) {
   const router = useRouter();
@@ -27,8 +25,8 @@ export default function HomeScreen({navigation}) {
     {
       id: 1,
       title: 'Crear/Editar\nReportes',
-      icon: require('./assets/da1.png'),
-      route: '/CreateReport'
+      icon: require('../../assets/da1.png'),
+      route: './test'
     },
     {
       id: 2,
@@ -60,39 +58,44 @@ export default function HomeScreen({navigation}) {
       icon: require('./assets/da6.png'),
       route: '/configuracion'
     }
+
   ];
 
   const handleNavigation = (route: string) => {
     console.log(`Navegando a: ${route}`);
-    router.push(route);
+     router.push(route);
+  };
+
+  const handleLogoPress = () => {
+    router.push('/landing');
   };
 
   return (
-    <SafeAreaView style={styles.fullScreen} edges={["top", "left", "right", "bottom"]}>
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <StatusBar barStyle="light-content" backgroundColor="#1a1a1a" />
       
       {/* Header 
       <View style={styles.header}>
-        <Image 
-          source={require('./assets/LogoT.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+        <TouchableOpacity onPress={handleLogoPress}>
+          <Image 
+            source={require('../../assets/LogoT.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
       </View>
         */}
       <CustomHeader navigation={navigation}/>
       {/* Navigation Tabs 
       <View style={styles.tabsContainer}>
-        <TouchableOpacity 
+        <View 
           style={[styles.tab, styles.tabActive]}
-          onPress={() => handleNavigation('/crear')}
         >
           <Text style={[styles.tabText, styles.tabTextActive]}>Crear</Text>
-        </TouchableOpacity>
+        </View>
         <TouchableOpacity 
           style={styles.tab}
-          onPress={() => handleNavigation('/administrar')}
+          onPress={() => handleNavigation('/admin')}
         >
           <Text style={styles.tabText}>Administrar</Text>
         </TouchableOpacity>
@@ -132,7 +135,6 @@ export default function HomeScreen({navigation}) {
           ))}
         </View>
       </ScrollView>
-    </View>
     </SafeAreaView>
   );
 }
@@ -147,7 +149,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   header: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#000000ff',
     paddingVertical: 20,
     paddingHorizontal: 20,
     alignItems: 'flex-start',
@@ -158,7 +160,7 @@ const styles = StyleSheet.create({
   },
   tabsContainer: {
     flexDirection: 'row',
-    backgroundColor: '#ff6347',
+    backgroundColor: '#EE4E34',
     paddingVertical: 0,
   },
   tab: {
@@ -197,10 +199,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 160,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
     elevation: 3,
     borderWidth: 2,
     borderColor: '#e0e0e0',
