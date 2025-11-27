@@ -63,7 +63,7 @@ export default function OperationsScreen() {
 
       {/* ==== HEADER NEGRO HQREPORT ==== */}
       <View style={styles.header}>
-        {/* Aquí podrías usar tu logo como <Image>, de momento dejo texto */}
+        {/* Aquí se puede usar el logo como <Image> */}
         <Text style={styles.logoText}>HQREPORT</Text>
 
         <View style={styles.headerIcons}>
@@ -156,7 +156,7 @@ export default function OperationsScreen() {
   );
 }
 
-// 3) ESTILOS: intentamos copiar la UI que mandaste
+// 3) ESTILOS: 
 const ORANGE = '#EE4E34';
 const BADGE_ORANGE = '#EE4E34';
 
