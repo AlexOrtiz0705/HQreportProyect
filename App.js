@@ -11,6 +11,7 @@ import CreateReport from './CreateReport';
 import EditReport from './EditReport';
 import main from './main.tsx';
 import ConfigReport from './ConfigReport';
+import InfoTecnicos from './InfoTecnicos';
 // import ReportScreen from './ReportScreen';
 import { StackScreen } from 'react-native-screens';
 
@@ -35,7 +36,7 @@ export default function App() {
       />
 
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Settings">
+        <Stack.Navigator initialRouteName="Login">
           <Stack.Screen
             name="Login"
             component={LoginScreen}
@@ -103,6 +104,11 @@ export default function App() {
           <Stack.Screen
             name="Appearance"
             component={AppearanceScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="InfoTecnicos"
+            component={InfoTecnicos}
             options={{ headerShown: false }}
           />
         </Stack.Navigator>

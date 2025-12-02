@@ -56,7 +56,7 @@ const REPORTS = [
   { id: '10', title: 'Reporte de Mantenimiento - Tienda#15 - Sector 9' },
 ];
 
-export default function OperationsScreen() {
+export default function OperationsScreen({navigation}) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
@@ -93,6 +93,16 @@ export default function OperationsScreen() {
           {/* Fila de 4 acciones (icono cuadrado + badge naranja + texto) */}
           <View style={styles.actionsRow}>
             {ACTIONS.map((action) => (
+              <TouchableOpacity
+                key={action.id}
+                style={styles.actionItem}
+                onPress={() => {
+                  if (action.label === 'Revisar') {
+                    navigation.navigate('InfoTecnicos');
+                  }
+                }}
+              >
+
               <View key={action.id} style={styles.actionItem}>
                 <View style={styles.iconWrapper}>
                   {/* Icono principal dentro del cuadrado */}
@@ -119,6 +129,7 @@ export default function OperationsScreen() {
                 {/* Texto debajo del icono */}
                 <Text style={styles.actionLabel}>{action.label}</Text>
               </View>
+              </TouchableOpacity>
             ))}
           </View>
 

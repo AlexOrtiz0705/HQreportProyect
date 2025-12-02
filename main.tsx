@@ -45,7 +45,7 @@ export default function HomeScreen({navigation}) {
       id: 4,
       title: 'Operaciones',
       icon: require('./assets/da4.png'),
-      route: '/operaciones'
+      route: 'Operations'
     },
     {
       id: 5,

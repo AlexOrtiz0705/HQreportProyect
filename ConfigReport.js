@@ -9,7 +9,7 @@ import {
   Image,
   Button,
 } from 'react-native';
-import { Snackbar } from 'react-native-paper';
+//import { Snackbar } from 'react-native-paper';
 
 import CustomHeader from './components/CustomHeader';
 import { useRouter } from 'expo-router';
