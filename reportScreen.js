@@ -26,33 +26,69 @@ import { Ionicons } from '@expo/vector-icons';
 // =========================
 const BACKEND_URL = "http://10.126.113.101:4000";
 
+// Imágenes de referencia para cada sección (puedes usar URLs o imágenes locales)
+const REFERENCE_IMAGES = {
+  'carcasa-superior': require('./assets/2.jpg'), // Cambia estas rutas
+  'teclado': require('./assets/1.jpg'),
+  'mousepad': require('./assets/4.jpg'),
+  'pantalla': require('./assets/3.jpg'),
+};
+
 export default function ReportScreen({ navigation }) {
   const { control, handleSubmit } = useForm();
 
   const [fechaHora, setFechaHora] = useState("");
   const [gpsCoords, setGpsCoords] = useState(null);
   const [showValidationModal, setShowValidationModal] = useState(false);
-  const [currentSectionKey, setCurrentSectionKey] = useState(null);
+  const [currentSection, setCurrentSection] = useState(null);
   const [tempPhotoUri, setTempPhotoUri] = useState(null);
   const [validationAttempts, setValidationAttempts] = useState({});
 
-  const [photoSections, setPhotoSections] = useState({
-    FachadaFrontal: null,
-    FachadaLateral: null,
-    Interior1: null,
-    Interior2: null,
-    Danio1: null,
-    Danio2: null,
-  });
+  // Definir las secciones de fotos de manera estructurada
+  const photoSectionsConfig = [
+    {
+      key: 'carcasa-superior',
+      title: 'Carcasa Superior',
+      referenceImage: REFERENCE_IMAGES['carcasa-superior'],
+      description: 'Foto de la parte superior de la laptop'
+    },
+    {
+      key: 'teclado',
+      title: 'Teclado',
+      referenceImage: REFERENCE_IMAGES['teclado'],
+      description: 'Foto completa del teclado'
+    },
+    {
+      key: 'mousepad',
+      title: 'Mousepad',
+      referenceImage: REFERENCE_IMAGES['mousepad'],
+      description: 'Foto del área del touchpad'
+    },
+    {
+      key: 'pantalla',
+      title: 'Pantalla',
+      referenceImage: REFERENCE_IMAGES['pantalla'],
+      description: 'Foto de la pantalla encendida'
+    },
+    {
+      key: 'danio1',
+      title: 'Daño 1',
+      description: 'Primer daño identificado'
+    },
+    {
+      key: 'danio2',
+      title: 'Daño 2',
+      description: 'Segundo daño identificado'
+    },
+  ];
 
-  const sectionTitles = {
-    FachadaFrontal: "Fachada Frontal",
-    FachadaLateral: "Fachada Lateral",
-    Interior1: "Interior Área 1",
-    Interior2: "Interior Área 2",
-    Danio1: "Daño 1",
-    Danio2: "Daño 2",
-  };
+  // Estado para almacenar las fotos tomadas
+  const [photoSections, setPhotoSections] = useState(
+    photoSectionsConfig.reduce((acc, section) => {
+      acc[section.key] = null;
+      return acc;
+    }, {})
+  );
 
   // ============================
   // FECHA
@@ -89,7 +125,7 @@ export default function ReportScreen({ navigation }) {
   // ============================
   // TOMAR FOTO
   // ============================
-  const takePhoto = async (sectionKey) => {
+  const takePhoto = async (section) => {
     try {
       const result = await ImagePicker.launchCameraAsync({
         quality: 0.7,
@@ -100,23 +136,23 @@ export default function ReportScreen({ navigation }) {
 
       const photo = result.assets[0];
       
-      // Guardar la foto temporal y mostrar modal de validación
+      // Guardar la foto temporal
       setTempPhotoUri(photo.uri);
-      setCurrentSectionKey(sectionKey);
+      setCurrentSection(section);
       
       // Simular validación de IA (primera vez falla, segunda vez pasa)
-      const attempts = validationAttempts[sectionKey] || 0;
+      const attempts = validationAttempts[section.key] || 0;
       
       if (attempts === 0) {
-        // Primera vez: mostrar modal de error
+        // Primera vez: mostrar modal de error con imagen de referencia
         setShowValidationModal(true);
         setValidationAttempts(prev => ({
           ...prev,
-          [sectionKey]: 1
+          [section.key]: 1
         }));
       } else {
-        // Segunda vez: aceptar la foto
-        acceptPhoto(sectionKey, photo);
+        // Segunda vez: aceptar la foto directamente
+        acceptPhoto(section, photo);
       }
       
     } catch (err) {
@@ -126,23 +162,23 @@ export default function ReportScreen({ navigation }) {
   };
 
   // ============================
-  // ACEPTAR FOTO DESPUÉS DE SEGUNDO INTENTO
+  // ACEPTAR FOTO
   // ============================
-  const acceptPhoto = async (sectionKey, photo) => {
+  const acceptPhoto = async (section, photo) => {
     try {
       const loc = await Location.getCurrentPositionAsync({});
       
-      // Simular datos de validación exitosa
+      // Simular datos de validación exitosa de IA
       const validacion = {
         coincide: true,
         confianza: 95,
         motivo: "Imagen válida - Coincide con la categoría",
-        descripcionDetectada: sectionTitles[sectionKey],
+        descripcionDetectada: section.title,
       };
 
       setPhotoSections((prev) => ({
         ...prev,
-        [sectionKey]: {
+        [section.key]: {
           uri: photo.uri,
           base64: photo.base64,
           gps: {
@@ -162,121 +198,144 @@ export default function ReportScreen({ navigation }) {
   };
 
   // ============================
-  // REINTENTAR DESPUÉS DE VER EL MODAL
+  // REINTENTAR DESPUÉS DEL MODAL
   // ============================
   const handleRetry = () => {
     setShowValidationModal(false);
     // Simular que ahora sí se aceptará la foto
-    if (currentSectionKey && tempPhotoUri) {
+    if (currentSection && tempPhotoUri) {
       const photo = { uri: tempPhotoUri, base64: "" };
-      acceptPhoto(currentSectionKey, photo);
+      acceptPhoto(currentSection, photo);
     }
   };
 
   // ============================
-  // MODAL DE VALIDACIÓN FALLIDA
+  // MODAL DE VALIDACIÓN FALLIDA CON IMAGEN DE REFERENCIA
   // ============================
-  const ValidationModal = () => (
-    <Modal
-      visible={showValidationModal}
-      transparent={true}
-      animationType="fade"
-      onRequestClose={() => setShowValidationModal(false)}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContainer}>
-          {/* Header del modal */}
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>HOREPORT</Text>
-            <TouchableOpacity 
-              onPress={() => setShowValidationModal(false)}
-              style={styles.closeButton}
-            >
-              <Ionicons name="close" size={24} color="#000" />
-            </TouchableOpacity>
-          </View>
-          
-          <Text style={styles.modalSubtitle}>Reporte Fotográfico</Text>
-          
-          {/* Mensaje de error */}
-          <View style={styles.errorMessageContainer}>
-            <Ionicons name="warning-outline" size={40} color="#FF6B6B" />
-            <Text style={styles.errorMessage}>
-              La imagen que intentas ingresar no es correcta, intenta nuevamente.
-            </Text>
-          </View>
-          
-          {/* Imagen de referencia */}
-          <View style={styles.referenceContainer}>
-            <Text style={styles.referenceTitle}>Imagen de referencia</Text>
-            <View style={styles.referenceImagePlaceholder}>
-              <Ionicons name="image-outline" size={50} color="#666" />
-              <Text style={styles.referenceText}>
-                {currentSectionKey ? sectionTitles[currentSectionKey] : "Referencia"}
-              </Text>
-            </View>
-          </View>
-          
-          {/* Recomendaciones */}
-          <View style={styles.recommendationsContainer}>
-            <Text style={styles.recommendationsTitle}>Recomendaciones:</Text>
-            
-            <View style={styles.recommendationItem}>
-              <Ionicons name="sunny-outline" size={20} color="#4A90E2" />
-              <Text style={styles.recommendationText}>
-                Asegúrate de tener buena iluminación
-              </Text>
+  const ValidationModal = () => {
+    if (!currentSection) return null;
+
+    return (
+      <Modal
+        visible={showValidationModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowValidationModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            {/* Header del modal */}
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>VALIDACIÓN DE IMAGEN</Text>
+              <TouchableOpacity 
+                onPress={() => setShowValidationModal(false)}
+                style={styles.closeButton}
+              >
+                <Ionicons name="close" size={24} color="#000" />
+              </TouchableOpacity>
             </View>
             
-            <View style={styles.recommendationItem}>
-              <Ionicons name="camera-outline" size={20} color="#4A90E2" />
-              <Text style={styles.recommendationText}>
-                Limpia el lente de tu cámara
+            <Text style={styles.modalSubtitle}>Revisa la imagen de referencia</Text>
+            
+            {/* Mensaje de error */}
+            <View style={styles.errorMessageContainer}>
+              <Ionicons name="warning-outline" size={40} color="#FF6B6B" />
+              <Text style={styles.errorMessage}>
+                La imagen tomada no coincide con lo esperado para:
               </Text>
+              <Text style={styles.sectionName}>{currentSection.title}</Text>
             </View>
             
-            <View style={styles.recommendationItem}>
-              <Ionicons name="build-outline" size={20} color="#4A90E2" />
-              <Text style={styles.recommendationText}>
-                Corrige lo que sea necesario
+            {/* Imagen de referencia */}
+            <View style={styles.referenceContainer}>
+              <Text style={styles.referenceTitle}>Imagen de referencia esperada:</Text>
+              <Text style={styles.referenceDescription}>
+                {currentSection.description}
               </Text>
+              
+              <View style={styles.referenceImageContainer}>
+                {currentSection.referenceImage ? (
+                  <Image 
+                    source={currentSection.referenceImage} 
+                    style={styles.referenceImage}
+                    resizeMode="contain"
+                  />
+                ) : (
+                  <View style={styles.referenceImagePlaceholder}>
+                    <Ionicons name="image-outline" size={50} color="#666" />
+                    <Text style={styles.referenceText}>
+                      Referencia: {currentSection.title}
+                    </Text>
+                    <Text style={styles.referenceSubtext}>
+                      {currentSection.description}
+                    </Text>
+                  </View>
+                )}
+              </View>
             </View>
-          </View>
-          
-          {/* Botones */}
-          <View style={styles.modalButtons}>
-            <TouchableOpacity 
-              style={[styles.modalButton, styles.retryButton]}
-              onPress={handleRetry}
-            >
-              <Text style={styles.retryButtonText}>Reintentar</Text>
-            </TouchableOpacity>
             
-            <TouchableOpacity 
-              style={[styles.modalButton, styles.cancelButton]}
-              onPress={() => setShowValidationModal(false)}
-            >
-              <Text style={styles.cancelButtonText}>Cancelar</Text>
-            </TouchableOpacity>
+            {/* Recomendaciones específicas */}
+            <View style={styles.recommendationsContainer}>
+              <Text style={styles.recommendationsTitle}>Recomendaciones para esta foto:</Text>
+              
+              <View style={styles.recommendationItem}>
+                <Ionicons name="camera-outline" size={20} color="#175cacff" />
+                <Text style={styles.recommendationText}>
+                  Enfoca completamente el área: {currentSection.title.toLowerCase()}
+                </Text>
+              </View>
+              
+              <View style={styles.recommendationItem}>
+                <Ionicons name="sunny-outline" size={20} color="#4A90E2" />
+                <Text style={styles.recommendationText}>
+                  Asegura buena iluminación sin reflejos
+                </Text>
+              </View>
+              
+              <View style={styles.recommendationItem}>
+                <Ionicons name="scan-outline" size={20} color="#4A90E2" />
+                <Text style={styles.recommendationText}>
+                  Toma la foto desde el ángulo correcto
+                </Text>
+              </View>
+            </View>
+            
+            {/* Botones */}
+            <View style={styles.modalButtons}>
+              <TouchableOpacity 
+                style={[styles.modalButton, styles.retryButton]}
+                onPress={handleRetry}
+              >
+                <Ionicons name="camera" size={20} color="white" />
+                <Text style={styles.retryButtonText}>Tomar Nueva Foto</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setShowValidationModal(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </View>
-    </Modal>
-  );
+      </Modal>
+    );
+  };
 
   // ==================================
   // ENVIAR REPORTE COMPLETO
   // ==================================
   const onSubmit = async (data) => {
     // Verificar que todas las fotos estén tomadas
-    const missingPhotos = Object.keys(photoSections).filter(
-      key => !photoSections[key]
+    const missingPhotos = photoSectionsConfig.filter(
+      section => !photoSections[section.key]
     );
     
     if (missingPhotos.length > 0) {
       Alert.alert(
         "Fotos faltantes",
-        `Necesitas tomar ${missingPhotos.length} fotos más.`
+        `Necesitas tomar ${missingPhotos.length} fotos más: ${missingPhotos.map(s => s.title).join(', ')}`
       );
       return;
     }
@@ -286,6 +345,7 @@ export default function ReportScreen({ navigation }) {
       fechaHora,
       gps_global: gpsCoords,
       fotos: photoSections,
+      modelo: "Laptop DELL INSPIRON 7460"
     };
 
     try {
@@ -304,15 +364,23 @@ export default function ReportScreen({ navigation }) {
   };
 
   // ============================
-  // UI SECCIÓN DE FOTO
+  // COMPONENTE DE SECCIÓN DE FOTO
   // ============================
-  const RenderPhotoSection = ({ title, sectionKey }) => {
-    const sec = photoSections[sectionKey];
-    const attempts = validationAttempts[sectionKey] || 0;
+  const RenderPhotoSection = ({ section }) => {
+    const sec = photoSections[section.key];
+    const attempts = validationAttempts[section.key] || 0;
     
     return (
       <View style={styles.photoSection}>
-        <Text style={styles.sectionTitle}>{title}</Text>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>{section.title}</Text>
+          {sec && (
+            <View style={styles.validatedIndicator}>
+              <Ionicons name="checkmark-circle" size={16} color="#27ae60" />
+              <Text style={styles.validatedIndicatorText}>Validada</Text>
+            </View>
+          )}
+        </View>
 
         {sec ? (
           <>
@@ -321,39 +389,60 @@ export default function ReportScreen({ navigation }) {
                 source={{ uri: sec.uri }}
                 style={styles.photoImage}
               />
-              <View style={styles.validatedBadge}>
-                <Ionicons name="checkmark-circle" size={20} color="#27ae60" />
-                <Text style={styles.validatedText}>Validada</Text>
-              </View>
             </View>
             
             <View style={styles.photoInfo}>
-              <Text style={styles.infoText}>
-                <Ionicons name="location-outline" size={14} /> GPS: {sec.gps.lat.toFixed(6)}, {sec.gps.lng.toFixed(6)}
-              </Text>
-              <Text style={[styles.infoText, styles.successText]}>
-                <Ionicons name="shield-checkmark-outline" size={14} /> {sec.validacion.motivo}
-              </Text>
-              <Text style={styles.infoText}>
-                <Ionicons name="stats-chart-outline" size={14} /> Confianza: {sec.validacion.confianza}%
-              </Text>
+              <View style={styles.infoRow}>
+                <Ionicons name="location-outline" size={14} color="#666" />
+                <Text style={styles.infoText}>
+                  GPS: {sec.gps.lat.toFixed(6)}, {sec.gps.lng.toFixed(6)}
+                </Text>
+              </View>
+              
+              <View style={styles.infoRow}>
+                <Ionicons name="shield-checkmark-outline" size={14} color="#27ae60" />
+                <Text style={[styles.infoText, styles.successText]}>
+                  {sec.validacion.motivo}
+                </Text>
+              </View>
+              
+              <View style={styles.infoRow}>
+                <Ionicons name="stats-chart-outline" size={14} color="#4A90E2" />
+                <Text style={styles.infoText}>
+                  Confianza IA: {sec.validacion.confianza}%
+                </Text>
+              </View>
             </View>
           </>
         ) : (
           <View style={styles.emptySection}>
-            <Ionicons name="camera-outline" size={50} color="#999" />
+            <Ionicons name="camera-outline" size={40} color="#999" />
             <Text style={styles.emptyText}>
-              {attempts > 0 ? "Intento fallido, toma la foto nuevamente" : "Sin imagen"}
+              {attempts > 0 ? "Intento fallido - Tomar nueva foto" : "Sin foto tomada"}
             </Text>
+            {attempts > 0 && (
+              <Text style={styles.attemptText}>
+                {attempts} intento(s) realizado(s)
+              </Text>
+            )}
           </View>
         )}
 
         <TouchableOpacity
-          onPress={() => takePhoto(sectionKey)}
-          style={styles.takePhotoButton}
+          onPress={() => takePhoto(section)}
+          style={[
+            styles.takePhotoButton,
+            sec && styles.retakeButton
+          ]}
         >
-          <Ionicons name="camera" size={20} color="white" />
-          <Text style={styles.takePhotoText}>Tomar Foto</Text>
+          <Ionicons 
+            name={sec ? "refresh" : "camera"} 
+            size={20} 
+            color="white" 
+          />
+          <Text style={styles.takePhotoText}>
+            {sec ? "Tomar Otra Foto" : "Tomar Foto"}
+          </Text>
         </TouchableOpacity>
       </View>
     );
@@ -368,100 +457,161 @@ export default function ReportScreen({ navigation }) {
       <ValidationModal />
       
       <ScrollView style={styles.container}>
-        {/* Encabezado */}
-        <View style={styles.header}>
-          <Text style={styles.dateTime}>{fechaHora}</Text>
+      {/* Encabezado principal con recuadro */}
+      <View style={styles.headerCard}>
+        <View style={styles.headerTitleRow}>
+          <Ionicons name="document-text-outline" size={24} color="#4A90E2" />
           <Text style={styles.mainTitle}>Reporte Fotográfico</Text>
         </View>
+        
+        <View style={styles.headerInfoContainer}>
+          <View style={styles.infoRow}>
+            <View style={styles.headerInfoContainer}>
+              <View style={styles.infoColumn}>
+                <View style={styles.infoItem}>
+                  <View style={styles.infoIconContainer}>
+                    <Ionicons name="time-outline" size={16} color="#666" />
+                  </View>
+                  <View>
+                    <Text style={styles.infoLabel}>Fecha y Hora</Text>
+                    <Text style={styles.infoValue}>{fechaHora}</Text>
+                  </View>
+                </View>
+                
+                <View style={styles.infoItem}>
+                  <View style={styles.infoIconContainer}>
+                    <Ionicons name="laptop-outline" size={16} color="#666" />
+                  </View>
+                  <View>
+                    <Text style={styles.infoLabel}>Modelo</Text>
+                    <Text style={styles.infoValue}>DELL INSPIRON 7460</Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
 
-        {/* GPS */}
-        <View style={styles.gpsSection}>
-          <Text style={styles.sectionLabel}>
-            <Ionicons name="navigate-outline" size={16} /> Ubicación actual:
-          </Text>
-          
+      {/* Sección de Ubicación con recuadro */}
+      <View style={styles.sectionCard}>
+        <View style={styles.sectionHeader}>
+          <Ionicons name="navigate" size={22} color="#4A90E2" />
+          <Text style={styles.sectionTitle}>Ubicación del Reporte</Text>
+        </View>
+        
+        <View style={styles.sectionContent}>
           {gpsCoords?.lat && gpsCoords?.lng ? (
             <>
-              <Text style={styles.coordinates}>
-                {gpsCoords.lat.toFixed(6)}, {gpsCoords.lng.toFixed(6)}
-              </Text>
-
-              <MapView
-                style={styles.map}
-                initialRegion={{
-                  latitude: gpsCoords.lat,
-                  longitude: gpsCoords.lng,
-                  latitudeDelta: 0.001,
-                  longitudeDelta: 0.001,
-                }}
-              >
-                <Marker
-                  coordinate={{
+              <View style={styles.coordinatesContainer}>
+                <Ionicons name="location" size={16} color="#d60e0eff" />
+                <Text style={styles.coordinatesLabel}>Coordenadas GPS:</Text>
+                <Text style={styles.sectionHeaderRow}>
+                  {gpsCoords.lat.toFixed(6)}, {gpsCoords.lng.toFixed(6)}
+                </Text>
+              </View>
+              
+              <View style={styles.mapContainer}>
+                <MapView
+                  style={styles.map}
+                  initialRegion={{
                     latitude: gpsCoords.lat,
                     longitude: gpsCoords.lng,
+                    latitudeDelta: 0.001,
+                    longitudeDelta: 0.001,
                   }}
-                  title="Ubicación actual"
-                />
-              </MapView>
+                >
+                  <Marker
+                    coordinate={{
+                      latitude: gpsCoords.lat,
+                      longitude: gpsCoords.lng,
+                    }}
+                    title="Ubicación actual"
+                  >
+                    <View style={styles.markerContainer}>
+                      <Ionicons name="location" size={24} color="#E53E3E" />
+                    </View>
+                  </Marker>
+                </MapView>
+               
+              </View>
             </>
           ) : (
-            <Text style={styles.loadingText}>Obteniendo ubicación...</Text>
+            <View style={styles.loadingContainer}>
+              <Ionicons name="locate" size={30} color="#999" />
+              <Text style={styles.loadingText}>Obteniendo ubicación GPS...</Text>
+              <Text style={styles.loadingSubtext}>Por favor espera</Text>
+            </View>
           )}
         </View>
+      </View>
 
         {/* FORMULARIO */}
         <View style={styles.formSection}>
-          <Text style={styles.formLabel}>Nombre de Sucursal</Text>
-          <Controller
-            control={control}
-            name="sucursal"
-            defaultValue=""
-            render={({ field: { onChange, value } }) => (
-              <TextInput
-                style={styles.input}
-                value={value}
-                onChangeText={onChange}
-                placeholder="Ej: Tienda Central"
-              />
-            )}
-          />
+          <Text style={styles.formLabel}>Información del Reporte</Text>
+          
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Nombre de Sucursal</Text>
+            <Controller
+              control={control}
+              name="sucursal"
+              defaultValue=""
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  style={styles.input}
+                  value={value}
+                  onChangeText={onChange}
+                  placeholder="Ej: Tienda Central"
+                />
+              )}
+            />
+          </View>
 
-          <Text style={styles.formLabel}>Tipo de Reporte</Text>
-          <Controller
-            control={control}
-            name="tipo_reporte"
-            defaultValue=""
-            render={({ field: { onChange, value } }) => (
-              <TextInput
-                style={styles.input}
-                value={value}
-                onChangeText={onChange}
-                placeholder="Ej: Mantenimiento preventivo"
-              />
-            )}
-          />
-
-          <Text style={styles.formLabel}>Modelo: Laptop DELL INSPIRON 7460</Text>
-        
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Tipo de Reporte</Text>
+            <Controller
+              control={control}
+              name="tipo_reporte"
+              defaultValue=""
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  style={styles.input}
+                  value={value}
+                  onChangeText={onChange}
+                  placeholder="Ej: Mantenimiento preventivo"
+                />
+              )}
+            />
+          </View>
         </View>
 
         {/* SECCIONES DE FOTOS */}
-        <Text style={styles.photosTitle}> Fotos Requeridas</Text>
+        <View style={styles.photosHeader}>
+          <Ionicons name="images-outline" size={24} color="#000" />
+          <Text style={styles.photosTitle}>Fotos Requeridas</Text>
+        </View>
         
-        <RenderPhotoSection title="Carcasa Superior" sectionKey="Carcasa Superior" />
-        <RenderPhotoSection title="Teclado" sectionKey="Teclado" />
-        <RenderPhotoSection title="Mousepad" sectionKey="Mousepad" />
-        <RenderPhotoSection title="Pantalla" sectionKey="Pantalla" />
-        <RenderPhotoSection title="Daño 1" sectionKey="Danio1" />
-        <RenderPhotoSection title="Daño 2" sectionKey="Danio2" />
+        {photoSectionsConfig.map((section) => (
+          <RenderPhotoSection 
+            key={section.key} 
+            section={section} 
+          />
+        ))}
+
+        {/* Contador de fotos */}
+        <View style={styles.counterContainer}>
+          <Text style={styles.counterText}>
+            📊 {Object.values(photoSections).filter(Boolean).length} de {photoSectionsConfig.length} fotos completadas
+          </Text>
+        </View>
 
         {/* Botón de enviar */}
         <TouchableOpacity
           onPress={handleSubmit(onSubmit)}
           style={styles.submitButton}
         >
-          <Ionicons name="paper-plane-outline" size={20} color="white" />
-          <Text style={styles.submitButtonText}>Enviar Reporte</Text>
+          <Ionicons name="paper-plane-outline" size={22} color="white" />
+          <Text style={styles.submitButtonText}>Enviar Reporte Completo</Text>
         </TouchableOpacity>
         
         <View style={styles.spacer} />
@@ -483,49 +633,80 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 20,
   },
+  dateTimeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
   dateTime: {
     fontSize: 14,
     color: '#666',
-    marginBottom: 5,
+    marginLeft: 6,
   },
   mainTitle: {
     fontSize: 28,
     fontWeight: 'bold',
     color: '#000',
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+    fontStyle: 'italic',
   },
   gpsSection: {
     marginBottom: 25,
+  },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   sectionLabel: {
     fontSize: 16,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 8,
+    marginLeft: 8,
   },
   coordinates: {
     fontSize: 14,
     color: '#444',
     marginBottom: 10,
+    fontFamily: 'monospace',
   },
   map: {
     width: '100%',
     height: 180,
     borderRadius: 12,
   },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
   loadingText: {
     color: '#999',
     fontStyle: 'italic',
-    marginBottom: 20,
+    marginLeft: 8,
   },
   formSection: {
     marginBottom: 25,
   },
   formLabel: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 16,
+  },
+  inputContainer: {
+    marginBottom: 16,
+  },
+  inputLabel: {
     fontSize: 16,
     fontWeight: '600',
     color: '#333',
     marginBottom: 8,
-    marginTop: 12,
   },
   input: {
     borderWidth: 1,
@@ -536,12 +717,17 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     fontSize: 16,
   },
-  photosTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#000',
+  photosHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginTop: 10,
     marginBottom: 20,
+  },
+  photosTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#000',
+    marginLeft: 8,
   },
   photoSection: {
     backgroundColor: '#fff',
@@ -556,14 +742,32 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 12,
+  },
+  validatedIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E8F5E9',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  validatedIndicatorText: {
+    color: '#27ae60',
+    fontWeight: '600',
+    fontSize: 12,
+    marginLeft: 4,
   },
   photoContainer: {
-    position: 'relative',
     marginBottom: 12,
   },
   photoImage: {
@@ -571,34 +775,21 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 8,
   },
-  validatedBadge: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 15,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  validatedText: {
-    color: '#27ae60',
-    fontWeight: '600',
-    fontSize: 12,
-    marginLeft: 4,
-  },
   photoInfo: {
     backgroundColor: '#f8f9fa',
     padding: 12,
     borderRadius: 8,
+    marginBottom: 12,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
   },
   infoText: {
     fontSize: 13,
     color: '#555',
-    marginBottom: 4,
-    flexDirection: 'row',
-    alignItems: 'center',
+    marginLeft: 8,
   },
   successText: {
     color: '#27ae60',
@@ -611,18 +802,26 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   emptyText: {
-    color: '#999',
+    color: '#666',
     marginTop: 10,
     textAlign: 'center',
+    fontSize: 14,
+  },
+  attemptText: {
+    color: '#999',
+    fontSize: 12,
+    marginTop: 4,
   },
   takePhotoButton: {
-    backgroundColor: '#e67e22',
+    backgroundColor: '#e09c08ff',
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 14,
     borderRadius: 8,
-    marginTop: 8,
+  },
+  retakeButton: {
+    backgroundColor: '#e67e22',
   },
   takePhotoText: {
     color: 'white',
@@ -630,8 +829,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 8,
   },
+  counterContainer: {
+    backgroundColor: '#E3F2FD',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  counterText: {
+    fontSize: 14,
+    color: '#1976D2',
+    fontWeight: '600',
+  },
   submitButton: {
-    backgroundColor: '#27ae60',
+    backgroundColor: '#5582b6ff',
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -653,7 +864,7 @@ const styles = StyleSheet.create({
   // Estilos del Modal de Validación
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
@@ -667,7 +878,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   modalHeader: {
-    backgroundColor: '#000',
+    backgroundColor: '#2C3E50',
     paddingVertical: 20,
     paddingHorizontal: 20,
     alignItems: 'center',
@@ -676,81 +887,110 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     color: '#FFFFFF',
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: 'bold',
-    letterSpacing: 1,
+    letterSpacing: 0.5,
   },
   closeButton: {
     position: 'absolute',
     right: 15,
     top: 15,
     padding: 5,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 15,
   },
   modalSubtitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginVertical: 20,
+    marginVertical: 15,
     color: '#333',
   },
   errorMessageContainer: {
     alignItems: 'center',
-    paddingHorizontal: 30,
-    paddingVertical: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
     backgroundColor: '#FFF5F5',
     marginHorizontal: 20,
     borderRadius: 12,
-    marginBottom: 20,
+    marginBottom: 15,
   },
   errorMessage: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#E53E3E',
     textAlign: 'center',
-    marginTop: 10,
-    lineHeight: 22,
+    marginTop: 8,
+  },
+  sectionName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#2C3E50',
+    marginTop: 5,
+    textAlign: 'center',
   },
   referenceContainer: {
     paddingHorizontal: 20,
-    marginBottom: 20,
+    marginBottom: 15,
   },
   referenceTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 10,
+    marginBottom: 5,
   },
-  referenceImagePlaceholder: {
-    backgroundColor: '#f0f0f0',
-    height: 150,
+  referenceDescription: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 10,
+    fontStyle: 'italic',
+  },
+  referenceImageContainer: {
+    backgroundColor: '#f8f9fa',
+    height: 200,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
     borderColor: '#ddd',
-    borderStyle: 'dashed',
+    overflow: 'hidden',
+  },
+  referenceImage: {
+    width: '100%',
+    height: '100%',
+  },
+  referenceImagePlaceholder: {
+    alignItems: 'center',
+    padding: 20,
   },
   referenceText: {
     marginTop: 10,
+    color: '#333',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  referenceSubtext: {
     color: '#666',
     fontSize: 14,
+    textAlign: 'center',
+    marginTop: 5,
   },
   recommendationsContainer: {
     paddingHorizontal: 20,
-    marginBottom: 25,
+    marginBottom: 20,
   },
   recommendationsTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 15,
+    marginBottom: 12,
   },
   recommendationItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   recommendationText: {
-    fontSize: 15,
+    fontSize: 14,
     color: '#444',
     marginLeft: 12,
     flex: 1,
@@ -768,14 +1008,17 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 10,
     alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   retryButton: {
-    backgroundColor: '#4A90E2',
+    backgroundColor: '#b66904ff',
   },
   retryButtonText: {
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
+    marginLeft: 8,
   },
   cancelButton: {
     backgroundColor: '#f0f0f0',
@@ -784,5 +1027,254 @@ const styles = StyleSheet.create({
     color: '#666',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  fullScreen: {
+    flex: 1,
+    backgroundColor: '#F5F7FA',
+  },
+  container: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+  // Encabezado principal
+  headerCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#E8ECF4',
+  },
+  headerTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  mainTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#2C3E50',
+    marginLeft: 12,
+  },
+  headerInfoContainer: {
+    backgroundColor: '#F8FAFC',
+    borderRadius: 12,
+    padding: 16,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  infoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  infoIconContainer: {
+    backgroundColor: '#FFFFFF',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+    borderWidth: 1,
+    borderColor: '#E8ECF4',
+  },
+  infoLabel: {
+    fontSize: 12,
+    color: '#718096',
+    marginBottom: 2,
+  },
+  infoValue: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#2D3748',
+  },
+  
+  // Tarjetas de sección
+  sectionCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#E8ECF4',
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2C3E50',
+    marginLeft: 10,
+  },
+  sectionContent: {
+    marginTop: 8,
+  },
+  sectionDescription: {
+    fontSize: 14,
+    color: '#718096',
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  
+  // Ubicación GPS
+  coordinatesContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F0F9FF',
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#E0F2FE',
+  },
+  coordinatesLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#0369A1',
+    marginLeft: 8,
+    marginRight: 6,
+  },
+  coordinatesValue: {
+    fontSize: 13,
+    color: '#0C4A6E',
+    fontFamily: 'monospace',
+    fontWeight: '500',
+  },
+  mapContainer: {
+    position: 'relative',
+  },
+  map: {
+    width: '100%',
+    height: 200,
+    borderRadius: 12,
+  },
+  mapCaption: {
+    position: 'absolute',
+    bottom: 10,
+    left: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    fontSize: 12,
+    color: '#2C3E50',
+  },
+  markerContainer: {
+    borderRadius: 15,
+    padding: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  
+  // Formulario
+  formContainer: {
+    gap: 16,
+  },
+  inputGroup: {
+    marginBottom: 8,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#4A5568',
+    marginBottom: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  textInput: {
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    backgroundColor: '#F8FAFC',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 10,
+    fontSize: 16,
+    color: '#2D3748',
+  },
+  
+  // Fotos
+  counterBadge: {
+    backgroundColor: '#4A90E2',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginLeft: 'auto',
+  },
+  counterText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  photosGrid: {
+    gap: 12,
+  },
+  
+  // Botón de enviar
+  submitButton: {
+    backgroundColor: '#456ea3ff',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 18,
+    borderRadius: 12,
+    marginTop: 8,
+    marginBottom: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  submitButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 18,
+    marginLeft: 10,
+  },
+  spacer: {
+    height: 30,
+  },
+  
+  // Estados de carga
+  loadingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 40,
+    backgroundColor: '#F8FAFC',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderStyle: 'dashed',
+  },
+  loadingText: {
+    color: '#4A5568',
+    fontSize: 16,
+    marginTop: 12,
+    fontWeight: '500',
+  },
+  loadingSubtext: {
+    color: '#A0AEC0',
+    fontSize: 14,
+    marginTop: 4,
   },
 });

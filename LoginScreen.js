@@ -108,7 +108,7 @@ const LoginScreen = ({ navigation }) => {
                   ¿Aún no tienes una cuenta?{' '}
                    
                 </Text>
-                // En tu LoginScreen.js
+               
                 <TouchableOpacity 
                   style={styles.forgotPasswordText} 
                   onPress={() => navigation.navigate('RegistroScreen')} // ← Aquí está el cambio
