@@ -6,13 +6,15 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 
 import LoginScreen from './LoginScreen';
-import PricingScreen from './Planes'; // Verifica la ruta
+import RegistroScreen from './RegistroScreen';
+import Planes from './Planes'; // Verifica la ruta
 import CreateReport from './CreateReport';
 import EditReport from './EditReport';
 import main from './main.tsx';
 import ConfigReport from './ConfigReport';
 import InfoTecnicos from './InfoTecnicos';
-// import ReportScreen from './ReportScreen';
+import ReportScreen from './reportScreen.js';
+import landing from './landing.tsx'
 import { StackScreen } from 'react-native-screens';
 
 import RegisteredUsersScreen from './RegisteredUsersScreen';
@@ -36,17 +38,23 @@ export default function App() {
       />
 
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Login">
+        <Stack.Navigator initialRouteName="Landing">
           <Stack.Screen
-            name="Login"
+            name="LoginScreen"
             component={LoginScreen}
             options={{ headerShown: false }}
           />
           <Stack.Screen
-            name="Pricing"
-            component={PricingScreen}
+            name="RegistroScreen"
+            component={RegistroScreen}
             options={{ headerShown: false }}
           />
+          <Stack.Screen
+            name="Planes"
+            component={Planes}
+            options={{ headerShown: false }}
+          />
+          
           <Stack.Screen
             name="CreateReport"
             component={CreateReport}
@@ -67,14 +75,18 @@ export default function App() {
             component={ConfigReport}
             options={{ headerShown: false }}
           />
+           <Stack.Screen
+              name="Landing"
+              component={landing}
+              options={{headerShown: false}}
+            ></Stack.Screen>
 
-          {/* Si algún día usan ReportScreen, aquí va:
-          <Stack.Screen
-            name="ReportScreen"
-            component={ReportScreen}
-            options={{ headerShown: false }}
-          />
-          */}
+
+            <Stack.Screen
+              name="reportScreen"
+              component={ReportScreen}
+              options={{headerShown: false}}
+            ></Stack.Screen>
 
           <Stack.Screen
             name="RegisteredUsers"

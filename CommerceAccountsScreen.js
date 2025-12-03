@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
+import CustomHeader from './components/CustomHeader';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -70,29 +71,16 @@ const COMPANIES = [
   },
 ];
 
-export default function CommerceAccountsScreen() {
+export default function CommerceAccountsScreen({navigation}) {
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea}edges={["top", "left", "right", "bottom"]}>
       {/* Barra de estado en claro sobre fondo oscuro */}
-      <StatusBar style="light" />
+       <StatusBar barStyle="light-content" backgroundColor="#000" />
+
+       <CustomHeader navigation={navigation} />
 
       {/* ==== HEADER NEGRO CON LOGO Y MENÚ ==== */}
-      <View style={styles.header}>
-        {/* Aquí idealmente usarías tu logo HQREPORT en PNG con <Image /> */}
-        <Text style={styles.logoText}>HQREPORT</Text>
-
-        <View style={styles.headerIcons}>
-          {/* Flecha atrás (no tiene navegación todavía) */}
-          <TouchableOpacity style={styles.headerIconButton}>
-            <Ionicons name="chevron-back" size={22} color="#ffffff" />
-          </TouchableOpacity>
-
-          {/* Menú hamburguesa */}
-          <TouchableOpacity style={styles.headerIconButton}>
-            <Ionicons name="menu" size={22} color="#ffffff" />
-          </TouchableOpacity>
-        </View>
-      </View>
+     
 
       {/* ==== BARRA NARANJA CON TÍTULO ==== */}
       <View style={styles.sectionTitleBar}>

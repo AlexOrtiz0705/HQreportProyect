@@ -10,11 +10,14 @@ import {
   StatusBar,
   Platform,
   Alert,
-  Image
+  Image,
+  Dimensions,
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
+
+const { width, height } = Dimensions.get('window');
 
 const PricingScreen = () => {
   const navigation = useNavigation();
@@ -76,116 +79,301 @@ const PricingScreen = () => {
       );
     }
     return (
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+      <ScrollView 
+        style={styles.scrollView} 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         {children}
       </ScrollView>
     );
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#000" />
-
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate('CreateReport')}>
-          <Text style={styles.logo}>HQREPORT</Text>
-        </TouchableOpacity>
-        <View style={styles.headerRight}>
-          <TouchableOpacity onPress={openDrawer}>
-            <Text style={styles.headerIcon}>Menu</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar 
+        backgroundColor="#000000" 
+        barStyle="light-content"
+        translucent={Platform.OS === 'android'}
+      />
+      
+      <View style={styles.container}>
+        {/* Header */}
+        
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.navigate('CreateReport')}>
+            <Text style={styles.logo}>HQREPORT</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={exportPDF} style={{ marginLeft: 20 }}>
-            <Text style={styles.headerIcon}>PDF</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <WebScroll>
-        {plans.map((plan, index) => (
-          <View key={index} style={[styles.card, { backgroundColor: plan.color }]}>
-            <View style={styles.cardTitleRow}>
-              <Image
-                source={typeof plan.image === 'string' ? { uri: plan.image } : plan.image}
-                style={{ width: 48, height: 48, marginRight: 12 }}
-                resizeMode="contain"
-              />
-              <Text style={styles.cardTitle}>{plan.title}</Text>
-            </View>
-
-            <Text style={styles.users}>{plan.users}</Text>
-
-            <View style={styles.features}>
-              {plan.features.map((feature, i) => (
-                <View key={i} style={styles.featureRow}>
-                  <Icon 
-                  />
-                  <Text style={styles.featureText}>{feature}</Text>
-                </View>
-              ))}
-            </View>
-
-            <Text style={styles.price}>{plan.price}</Text>
-
-            {(plan.title === 'Premium' || plan.title === 'Empresarial') && (
-              <Text style={styles.monitoring}>Monitoreo IA</Text>
-            )}
-
-            <TouchableOpacity style={styles.buyButton}>
-              <Text style={styles.buyButtonText}>Comprar ahora</Text>
+          <View style={styles.headerRight}>
+            <TouchableOpacity onPress={openDrawer} style={styles.headerButton}>
+              <Icon name="menu-outline" size={24} color="#FFF" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={exportPDF} style={styles.headerButton}>
+              <Icon name="document-text-outline" size={24} color="#FFF" />
             </TouchableOpacity>
           </View>
-        ))}
-      </WebScroll>
+        </View>
+
+        {/* Contenido */}
+        <WebScroll>
+          <View style={styles.content}>
+            {/* Título */}
+            <View style={styles.titleContainer}>
+              <Text style={styles.mainTitle}>Planes Disponibles</Text>
+              <Text style={styles.subTitle}>Elige el plan que mejor se adapte a tus necesidades</Text>
+            </View>
+
+            {/* Tarjetas de planes */}
+            {plans.map((plan, index) => (
+              <View key={index} style={[styles.card, { backgroundColor: plan.color }]}>
+                <View style={styles.cardHeader}>
+                  <View style={styles.cardTitleRow}>
+                    <Image
+                      source={typeof plan.image === 'string' ? { uri: plan.image } : plan.image}
+                      style={styles.planImage}
+                      resizeMode="contain"
+                    />
+                    <View style={styles.titleWrapper}>
+                      <Text style={styles.cardTitle}>{plan.title}</Text>
+                      <Text style={styles.users}>{plan.users}</Text>
+                    </View>
+                  </View>
+                </View>
+
+                <View style={styles.features}>
+                  {plan.features.map((feature, i) => (
+                    <View key={i} style={styles.featureRow}>
+                      <Icon name="checkmark-circle" size={18} color="#4CAF50" style={styles.featureIcon} />
+                      <Text style={styles.featureText}>{feature}</Text>
+                    </View>
+                  ))}
+                </View>
+
+                <View style={styles.priceContainer}>
+                  <Text style={styles.price}>{plan.price}</Text>
+                  <Text style={styles.pricePeriod}>/mes</Text>
+                </View>
+
+                {(plan.title === 'Premium' || plan.title === 'Empresarial') && (
+                  <View style={styles.badgeContainer}>
+                    <View style={styles.badge}>
+                      <Icon name="sparkles" size={14} color="#FF9800" />
+                      <Text style={styles.badgeText}>Incluye Monitoreo IA</Text>
+                    </View>
+                  </View>
+                )}
+
+                <TouchableOpacity style={styles.buyButton}>
+                  <Text style={styles.buyButtonText}>Comprar ahora</Text>
+                  <Icon name="arrow-forward" size={18} color="#FFF" style={styles.buttonIcon} />
+                </TouchableOpacity>
+              </View>
+            ))}
+            
+            {/* Nota al pie */}
+            <View style={styles.footerNote}>
+              <Text style={styles.footerNoteText}>
+                * Todos los planes incluyen actualizaciones gratuitas y soporte técnico
+              </Text>
+            </View>
+          </View>
+        </WebScroll>
+      </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000' },
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingHorizontal: 20,
+    paddingTop: Platform.OS === 'ios' ? 10 : StatusBar.currentHeight + 10,
+    paddingBottom: 15,
     backgroundColor: '#000',
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
   },
-  logo: { color: '#FFF', fontSize: 22, fontWeight: 'bold' },
-  headerRight: { flexDirection: 'row' },
-  headerIcon: { color: '#FFF', fontSize: 18 },
-  scrollView: { flex: 1 },
-  scrollContent: { padding: 16, paddingBottom: 40 },
-  card: {
-    marginBottom: 16,
-    padding: 16,
-    borderRadius: 16,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+  logo: { 
+    color: '#FFF', 
+    fontSize: 24, 
+    fontWeight: 'bold',
+    letterSpacing: 1,
   },
-  cardTitleRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
-  cardTitle: { fontSize: 20, fontWeight: 'bold', color: '#000' },
-  users: { fontSize: 15, color: '#555', marginBottom: 12, fontWeight: '500' },
-  features: { marginBottom: 16 },
-  featureRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
-  featureText: { fontSize: 14.5, color: '#333', flex: 1, lineHeight: 22, fontWeight: '500' },
-  price: { fontSize: 28, fontWeight: 'bold', color: '#000', marginBottom: 6 },
-  monitoring: {
-    fontSize: 13,
-    color: '#666',
+  headerRight: { 
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerButton: {
+    marginLeft: 20,
+    padding: 5,
+  },
+  scrollView: { 
+    flex: 1,
+  },
+  scrollContent: { 
+    paddingBottom: 40,
+    minHeight: height - 100,
+  },
+  content: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 40,
+  },
+  titleContainer: {
+    alignItems: 'center',
+    marginBottom: 30,
+    paddingHorizontal: 10,
+  },
+  mainTitle: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#FFF',
+    marginBottom: 8,
     textAlign: 'center',
+  },
+  subTitle: {
+    fontSize: 16,
+    color: '#AAA',
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  card: {
+    marginBottom: 24,
+    padding: 24,
+    borderRadius: 20,
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.05)',
+  },
+  cardHeader: {
+    marginBottom: 20,
+  },
+  cardTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  planImage: {
+    width: 56,
+    height: 56,
+    marginRight: 16,
+  },
+  titleWrapper: {
+    flex: 1,
+  },
+  cardTitle: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: '#000',
+    marginBottom: 4,
+  },
+  users: {
+    fontSize: 16,
+    color: '#666',
+    fontWeight: '500',
+  },
+  features: {
+    marginBottom: 24,
+    paddingVertical: 8,
+  },
+  featureRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 14,
+  },
+  featureIcon: {
+    marginRight: 12,
+    marginTop: 2,
+  },
+  featureText: {
+    fontSize: 15,
+    color: '#333',
+    flex: 1,
+    lineHeight: 22,
+    fontWeight: '500',
+  },
+  priceContainer: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
     marginBottom: 16,
-    fontStyle: 'italic',
+  },
+  price: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#000',
+    marginRight: 6,
+  },
+  pricePeriod: {
+    fontSize: 16,
+    color: '#666',
+    fontWeight: '500',
+  },
+  badgeContainer: {
+    marginBottom: 20,
+  },
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 152, 0, 0.1)',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
+  },
+  badgeText: {
+    fontSize: 14,
+    color: '#FF9800',
+    fontWeight: '600',
+    marginLeft: 8,
   },
   buyButton: {
     backgroundColor: '#FF9800',
-    paddingVertical: 14,
-    borderRadius: 30,
+    flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
+    paddingVertical: 16,
+    borderRadius: 30,
+    elevation: 4,
+    shadowColor: '#FF9800',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
   },
-  buyButtonText: { color: '#FFF', fontWeight: 'bold', fontSize: 16 },
+  buyButtonText: {
+    color: '#FFF',
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  buttonIcon: {
+    marginLeft: 10,
+  },
+  footerNote: {
+    marginTop: 30,
+    padding: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  footerNoteText: {
+    fontSize: 14,
+    color: '#AAA',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
 });
 
 export default PricingScreen;

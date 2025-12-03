@@ -39,7 +39,7 @@ export default function HomeScreen({navigation}) {
       id: 3,
       title: 'Cuentas de\nComercio',
       icon: require('./assets/da3.png'),
-      route: '/cuentas'
+      route: 'CommerceAccounts'
     },
     {
       id: 4,
@@ -51,13 +51,13 @@ export default function HomeScreen({navigation}) {
       id: 5,
       title: 'Usuarios\nRegistrados',
       icon: require('./assets/da5.png'),
-      route: '/usuarios'
+      route: 'RegisteredUsers'
     },
     {
       id: 6,
       title: 'Configuración',
       icon: require('./assets/da6.png'),
-      route: '/configuracion'
+      route: 'Settings'
     }
 
   ];
@@ -73,6 +73,7 @@ export default function HomeScreen({navigation}) {
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+      
       <StatusBar barStyle="light-content" backgroundColor="#1a1a1a" />
       
       {/* Header 

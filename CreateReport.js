@@ -16,6 +16,7 @@ import Logo from "./assets/Logo.png";
 import CustomHeader from "./components/CustomHeader";
 import DynamicTabBar from "./components/DynamicTabBar";
 
+
 // --- Componente de Reporte Editable ---
 const EditableReportCard = ({ title, date, onEdit }) => (
  <View style={styles.card}>
@@ -146,8 +147,7 @@ export default function CreateReport({ navigation }) {
           key={r.id}
           title={r.title}
           date={r.date}
-          onEdit={() => console.log(`Editar ${r.title}`)}
-         />
+          onEdit={() => navigation.navigate('reportScreen') }     />
         ))}
       </ScrollView>
      </View>

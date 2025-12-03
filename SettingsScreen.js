@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
+import CustomHeader from './components/CustomHeader';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -43,22 +44,10 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.safeArea}>
       {/* Barra de estado en claro sobre fondo oscuro */}
       <StatusBar style="light" />
+      <CustomHeader navigation={navigation} />
+      
 
-      {/* ==== HEADER NEGRO CON LOGO Y MENÚ ==== */}
-      <View style={styles.header}>
-        <Text style={styles.logoText}>HQREPORT</Text>
-
-        <View style={styles.headerIcons}>
-          <TouchableOpacity style={styles.headerIconButton}>
-            <Ionicons name="chevron-back" size={22} color="#ffffff" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.headerIconButton}>
-            <Ionicons name="menu" size={22} color="#ffffff" />
-          </TouchableOpacity>
-        </View>
-      </View>
-
+     
       {/* ==== BARRA NARANJA CON TÍTULO ==== */}
       <View style={styles.sectionTitleBar}>
         <Text style={styles.sectionTitleText}>Configuración</Text>

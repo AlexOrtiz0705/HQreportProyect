@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
+import CustomHeader from './components/CustomHeader';
 import { StatusBar } from 'expo-status-bar';
 // Iconos de Expo (para el menú y la flecha de atrás)
 import { Ionicons } from '@expo/vector-icons';
@@ -66,7 +67,7 @@ const USERS = [
   },
 ];
 
-export default function RegisteredUsersScreen() {
+export default function RegisteredUsersScreen({navigation}) {
   // 2) Estado para el cuadro de búsqueda.
   const [search, setSearch] = useState('');
 
@@ -80,24 +81,8 @@ export default function RegisteredUsersScreen() {
       {/* Barra de estado clara sobre fondo oscuro */}
       <StatusBar style="light" />
 
-      {/* 4) Encabezado negro con logo HQREPORT y menú */}
-      <View style={styles.header}>
-        {/* Aquí idealmente usarías tu logo en PNG. 
-            Por ahora, lo simulamos con texto. */}
-        <Text style={styles.logoText}>HQREPORT</Text>
-
-        <View style={styles.headerIcons}>
-          {/* Botón de "volver" (no tiene acción aún) */}
-          <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="chevron-back" size={22} color="#ffffff" />
-          </TouchableOpacity>
-
-          {/* Botón de menú hamburguesa */}
-          <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="menu" size={22} color="#ffffff" />
-          </TouchableOpacity>
-        </View>
-      </View>
+      <CustomHeader navigation={navigation} />
+            
 
       {/* 5) Barra naranja con el título "Usuarios Registrados" */}
       <View style={styles.sectionTitleBar}>

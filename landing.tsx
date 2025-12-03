@@ -196,14 +196,14 @@ export default function App() {
         {/* 1. HEADER */}
         <View style={styles.header}>
            <Image 
-             source={require('../assets/LogoT.png')}
+             source={require('./assets/LogoT.png')}
              style={{ width: 180, height: 40, marginLeft: -8 }}
              resizeMode="contain"
            />
           <View style={styles.headerRight}>
             <TouchableOpacity 
               style={styles.ctaButtonHeader}
-              onPress={() => router.push('./LoginScreen')}
+              onPress={() => navigation.navigate('LoginScreen')}
             >
               <Text style={styles.ctaButtonTextHeader}>¡Comienza ya!</Text>
             </TouchableOpacity>
@@ -227,14 +227,14 @@ export default function App() {
           <Text style={styles.logosText}>Contamos con la confianza de:</Text>
           <View style={styles.logosGrid}>
             <View style={styles.logoColumn}>
-              <Image source={require('../assets/li1.png')} style={styles.partnerLogoImg} resizeMode="contain" />
-              <Image source={require('../assets/li2.png')} style={styles.partnerLogoImg} resizeMode="contain" />
-              <Image source={require('../assets/li3.png')} style={styles.partnerLogoImg} resizeMode="contain" />
+              <Image source={require('./assets/li1.png')} style={styles.partnerLogoImg} resizeMode="contain" />
+              <Image source={require('./assets/li2.png')} style={styles.partnerLogoImg} resizeMode="contain" />
+              <Image source={require('./assets/li3.png')} style={styles.partnerLogoImg} resizeMode="contain" />
             </View>
             <View style={styles.logoColumn}>
-              <Image source={require('../assets/li4.png')} style={styles.partnerLogoImg} resizeMode="contain" />
-              <Image source={require('../assets/li5.png')} style={styles.partnerLogoImg} resizeMode="contain" />
-              <Image source={require('../assets/li6.png')} style={styles.partnerLogoImg} resizeMode="contain" />
+              <Image source={require('./assets/li4.png')} style={styles.partnerLogoImg} resizeMode="contain" />
+              <Image source={require('./assets/li5.png')} style={styles.partnerLogoImg} resizeMode="contain" />
+              <Image source={require('./assets/li6.png')} style={styles.partnerLogoImg} resizeMode="contain" />
             </View>
           </View>
         </View>
@@ -255,22 +255,22 @@ export default function App() {
           <View style={styles.featureGrid}>
             {[
               { 
-                icon: require('../assets/b1.png'),
+                icon: require('./assets/b1.png'),
                 title: 'Amplifica tu visión', 
                 desc: 'Desbloquea decisiones basadas en datos con análisis integrales, revelando oportunidades clave para el crecimiento estratégico regional.' 
               },
               { 
-                icon: require('../assets/b2.png'),
+                icon: require('./assets/b2.png'),
                 title: 'Controla tu presencia global', 
                 desc: 'Gestiona y supervisa sedes satélite, garantizando un rendimiento consistente y operaciones optimizadas en todos los lugares.' 
               },
               { 
-                icon: require('../assets/b3.png'),
+                icon: require('./assets/b3.png'),
                 title: 'Remueve las barreras de lenguaje', 
                 desc: 'Adáptate a mercados diversos con localización integrada para una comunicación clara y una mejor experiencia de usuario.' 
               },
               { 
-                icon: require('../assets/b4.png'),
+                icon: require('./assets/b4.png'),
                 title: 'Visualiza tu crecimiento', 
                 desc: 'Genera informes precisos y visualmente atractivos que ilustren tus trayectorias de crecimiento en todas las regiones.' 
               }
@@ -318,13 +318,13 @@ export default function App() {
 
             <TouchableOpacity 
               style={styles.unifiedButton}
-              onPress={() => router.push('./Planes')}
+              onPress={() => navigation.navigate('Planes')}
             >
               <Text style={styles.unifiedButtonText}>Ver Planes</Text>
             </TouchableOpacity>
 
             <Image 
-              source={require('../assets/p1.png')} 
+              source={require('./assets/p1.png')} 
               style={styles.cylinderImage}
               resizeMode="cover"
             />
@@ -404,7 +404,7 @@ export default function App() {
             <View style={styles.testimonialContainer}>
                 <View style={styles.testimonialImageWrapper}>
                    <Image 
-                     source={require('../assets/c1.jpg')}
+                     source={require('./assets/c1.jpg')}
                      style={styles.testimonialImage}
                      resizeMode="cover"
                    />
@@ -450,7 +450,7 @@ export default function App() {
              <View style={styles.footerLeftBlock}>
                 {/* IMAGEN DEL LOGO DE FOOTER */}
                 <Image 
-                  source={require('../assets/IconT.png')} 
+                  source={require('./assets/IconT.png')} 
                   style={styles.footerLogo}
                   resizeMode="contain"
                 />

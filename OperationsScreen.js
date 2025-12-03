@@ -6,8 +6,10 @@ import {
   ScrollView,
   TouchableOpacity,
   SafeAreaView,
+  StatusBar,
+  Platform,
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import CustomHeader from './components/CustomHeader';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 // 1) Acciones de la fila superior (iconos cuadrados + burbuja naranja)
@@ -56,26 +58,12 @@ const REPORTS = [
   { id: '10', title: 'Reporte de Mantenimiento - Tienda#15 - Sector 9' },
 ];
 
-export default function OperationsScreen({navigation}) {
+export default function OperationsScreen({ navigation }) {
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar style="light" />
-
-      {/* ==== HEADER NEGRO HQREPORT ==== */}
-      <View style={styles.header}>
-        {/* Aquí se puede usar el logo como <Image> */}
-        <Text style={styles.logoText}>HQREPORT</Text>
-
-        <View style={styles.headerIcons}>
-          <TouchableOpacity style={styles.headerIconButton}>
-            <Ionicons name="chevron-back" size={22} color="#ffffff" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.headerIconButton}>
-            <Ionicons name="menu" size={22} color="#ffffff" />
-          </TouchableOpacity>
-        </View>
-      </View>
+    <SafeAreaView style={styles.fullScreen} edges={["top", "left", "right", "bottom"]}>
+          <StatusBar barStyle="light-content" backgroundColor="#000" />
+          
+          <CustomHeader navigation={navigation} />
 
       {/* ==== BARRA NARANJA "Operaciones" ==== */}
       <View style={styles.sectionTitleBar}>
@@ -95,40 +83,39 @@ export default function OperationsScreen({navigation}) {
             {ACTIONS.map((action) => (
               <TouchableOpacity
                 key={action.id}
-                style={styles.actionItem}
+                style={styles.actionTouchable}
                 onPress={() => {
                   if (action.label === 'Revisar') {
                     navigation.navigate('InfoTecnicos');
                   }
                 }}
               >
+                <View style={styles.actionItem}>
+                  <View style={styles.iconWrapper}>
+                    {/* Icono principal dentro del cuadrado */}
+                    {action.iconLib === 'material' ? (
+                      <MaterialCommunityIcons
+                        name={action.iconName}
+                        size={36}
+                        color="#000000"
+                      />
+                    ) : (
+                      <Ionicons
+                        name={action.iconName}
+                        size={36}
+                        color="#000000"
+                      />
+                    )}
 
-              <View key={action.id} style={styles.actionItem}>
-                <View style={styles.iconWrapper}>
-                  {/* Icono principal dentro del cuadrado */}
-                  {action.iconLib === 'material' ? (
-                    <MaterialCommunityIcons
-                      name={action.iconName}
-                      size={36}
-                      color="#000000"
-                    />
-                  ) : (
-                    <Ionicons
-                      name={action.iconName}
-                      size={36}
-                      color="#000000"
-                    />
-                  )}
-
-                  {/* Burbuja naranja con el número */}
-                  <View style={styles.badge}>
-                    <Text style={styles.badgeText}>{action.count}</Text>
+                    {/* Burbuja naranja con el número */}
+                    <View style={styles.badge}>
+                      <Text style={styles.badgeText}>{action.count}</Text>
+                    </View>
                   </View>
-                </View>
 
-                {/* Texto debajo del icono */}
-                <Text style={styles.actionLabel}>{action.label}</Text>
-              </View>
+                  {/* Texto debajo del icono */}
+                  <Text style={styles.actionLabel}>{action.label}</Text>
+                </View>
               </TouchableOpacity>
             ))}
           </View>
@@ -172,33 +159,14 @@ const ORANGE = '#EE4E34';
 const BADGE_ORANGE = '#EE4E34';
 
 const styles = StyleSheet.create({
+  fullScreen: {
+    flex: 1,
+    backgroundColor: '#F9F9F9',
+  },
+
   safeArea: {
     flex: 1,
     backgroundColor: '#ffffff',
-  },
-
-  /* HEADER NEGRO */
-  header: {
-    height: 70,
-    backgroundColor: '#000000',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    justifyContent: 'space-between',
-  },
-  logoText: {
-    color: '#ffffff',
-    fontSize: 18,
-    fontWeight: '550',
-    letterSpacing: 2,
-  },
-  headerIcons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  headerIconButton: {
-    padding: 6,
   },
 
   /* BARRA NARANJA DEL TÍTULO */
@@ -235,6 +203,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
+  actionTouchable: {
+    alignItems: 'center',
+  },
   actionItem: {
     alignItems: 'center',
   },
@@ -247,7 +218,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#ffffff',
     position: 'relative',
-    shadowColor: '#000',          
+    shadowColor: '#000',
     shadowOpacity: 0.18,          // qué tan marcada (0 a 1)
     shadowOffset: { width: 0, height: 3 }, // hacia dónde se desplaza
     shadowRadius: 4,               // qué tan difusa
@@ -265,8 +236,6 @@ const styles = StyleSheet.create({
     borderColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,          // grosor del borde
-    borderColor: '#000000ff',  // color del borde (blanco, como en el diseño)
   },
   badgeText: {
     color: '#ffffff',
@@ -326,5 +295,10 @@ const styles = StyleSheet.create({
     height: 50,
     backgroundColor: '#000000',
     width: '100%',
+  },
+  
+  container: {
+    padding: 16,
+    flex: 1,
   },
 });
